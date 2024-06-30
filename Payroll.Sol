@@ -1,0 +1,94 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.18;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
+contract AllowanceWallet is Ownable {
+    using SafeMath for uint;
+
+    // Para cada crypto wallet tenemos un Allowance con las siguientes propiedades:
+    struct Allowance {
+        uint allowanceAmount; // monto de la asignación
+        uint allowancePeriodInDays; // cada cuantos días  puede retirar la asignación
+        uint whenLastAllowance; // timestamp de la última vez que se retiró la asignación
+        uint unspentAllowance; // monto de la asignación no utilizada
+    }
+    
+    mapping(address => Allowance) allowances;
+    
+    event AllowanceCreated(address indexed addr, Allowance newAllowance);
+    event AllowanceDeleted(address indexed addr);
+    event AllowanceChanged(address indexed addr, Allowance newAllowance);
+    event MoneyReceived(address indexed addr, uint amount);
+    event MoneySent(address indexed addr, uint amount);
+
+    // Agregar crypto holders con allowance
+    function addAllowance(address addr, uint allowanceAmount, uint allowancePeriodInDays) public onlyOwner {
+        require(allowances[addr].allowanceAmount == 0, "Allowance already exists");
+        require(address(this).balance >= allowanceAmount, "Wallet balance too low to add allowance");
+        
+        // Inicializar nueva asignación
+        Allowance memory allowance;
+        allowance.allowanceAmount = allowanceAmount;
+        allowance.allowancePeriodInDays = allowancePeriodInDays.mul(1 days);
+        allowance.whenLastAllowance = block.timestamp;
+        allowance.unspentAllowance = allowanceAmount;
+        
+        allowances[addr] = allowance;
+        emit AllowanceCreated(addr, allowance);
+    }
+    
+    // Quitar crypto holders con allowance
+    function removeAllowance(address payable addr) public onlyOwner {
+        require(allowances[addr].allowanceAmount != 0, "Allowance already doesn't exist");
+        
+        // Pagar el balance no utilizado antes de eliminar al holder
+        if(allowances[addr].unspentAllowance > 0){
+            require(address(this).balance >= allowances[addr].unspentAllowance, "Wallet balance too low to payout unspent allowance");
+            addr.transfer(allowances[addr].unspentAllowance);
+        }
+        
+        delete allowances[addr];
+        
+        emit MoneySent(addr, allowances[addr].unspentAllowance);
+        emit AllowanceDeleted(addr);
+    }
+    
+    function getPaidAllowance(uint amount) public {
+        require(allowances[msg.sender].allowanceAmount > 0, "You're not a recipient of an allowance");
+        require(address(this).balance >= amount, "Wallet balance too low to pay allowance");
+        
+        // Calcular y actualizar asignación no utilizada
+        uint numAllowances = block.timestamp.sub(allowances[msg.sender].whenLastAllowance).div(allowances[msg.sender].allowancePeriodInDays);
+        allowances[msg.sender].unspentAllowance = allowances[msg.sender].allowanceAmount.mul(numAllowances).add(allowances[msg.sender].unspentAllowance);
+        allowances[msg.sender].whenLastAllowance = numAllowances.mul(1 days).add(allowances[msg.sender].whenLastAllowance);
+        
+        // Pagar asignación
+        require(allowances[msg.sender].unspentAllowance >= amount, "You asked for more allowance than you're owed'");
+        payable(msg.sender).transfer(amount);
+        allowances[msg.sender].unspentAllowance = allowances[msg.sender].unspentAllowance.sub(amount);
+        
+        emit MoneySent(msg.sender, amount);
+        emit AllowanceChanged(msg.sender, allowances[msg.sender]);
+    }
+    // El owner del contrato puede retirar un monto menor o igual al balance del contrato
+    function withdrawFromWalletBalance(address payable addr, uint amount) public onlyOwner {
+        require(address(this).balance >= amount, "Wallet balance too low to fund withdraw");
+        addr.transfer(amount);
+        
+        emit MoneySent(msg.sender, amount);
+    }
+    // El owner puede retirar todo el balance del contrato
+    function withdrawAllFromWalletBalance(address payable addr) public onlyOwner {
+        withdrawFromWalletBalance(addr, address(this).balance);
+    }
+    
+    function renounceOwnership() public override view onlyOwner {
+        revert("Can't renounce ownership");
+    }
+    // receive es para que cualquiera pueda fondear el contrato
+    receive () external payable {
+        emit MoneyReceived(msg.sender, msg.value);
+    }
+}
