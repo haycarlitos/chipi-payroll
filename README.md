@@ -28,19 +28,20 @@ Paga tu nómina en cripto.
     <br>
 <p>
 2. Deja que tus empleados hagan retiros cuando quieran.
+
+3. Ahorra tiempo y dinero pagando uno por uno.Monitorea tu negocio en todo momento.
 <p align="center">
     <br>
-    <img src="pantalla3.PNG" width="500"/>
+    <img src="dashb.png" width="500"/>
     <br>
 <p>
-3. Ahorra tiempo y dinero pagando uno por uno.
 
 
 ### Empleado
 1. Crea tu cuenta en Chipi. 
 <p align="center">
     <br>
-    <img src="pantalla4.PNG" width="500"/>
+    <img src="home.jpeg" width="500"/>
     <br>
 <p>
 2. Retira tu dinero cuando lo necesites o ahorra con AAVE (Muy pronto).
