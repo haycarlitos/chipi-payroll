@@ -24,7 +24,7 @@ Paga tu nómina en cripto.
 1. Agrega nóminas con una dirección de wallet, monto y días de pago.
 <p align="center">
     <br>
-    <img src="pantalla2.PNG" width="500"/>
+    <img src="payroll.png" width="500"/>
     <br>
 <p>
 2. Deja que tus empleados hagan retiros cuando quieran.
