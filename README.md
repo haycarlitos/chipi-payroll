@@ -4,7 +4,7 @@ Paga tu nómina en cripto.
 
 <p align="center">
     <br>
-    <img src="pantalla1.PNG" width="500"/>
+    <img src="landin.png" width="500"/>
     <br>
 <p>
 
