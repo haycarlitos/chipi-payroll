@@ -16,9 +16,12 @@ Paga tu nómina en cripto.
 | Frontend  | https://chipi-payroll.vercel.app |
 | Landing Page | https://chipipay.com |
 | One Pager | https://www.figma.com/proto/kKwLKE4N7FG5VloL1a5l2G/Chipi-Pay?node-id=2516-1083&t=sWtx2ESju5GzSgUc-9&scaling=min-zoom&page-id=2516%3A1082&starting-point-node-id=2516%3A1083&show-proto-sidebar=1 |
+|Construyendo Chipi | https://www.youtube.com/watch?v=e8ReI9Oa4B4 |
 
 
 ## ¿Cómo funciona?
+
+[![YouTube Video](https://img.youtube.com/vi/m7d8kQOE2Bg/0.jpg)](https://youtu.be/m7d8kQOE2Bg)
 
 ### Empresa
 1. Agrega nóminas con una dirección de wallet, monto y días de pago.
